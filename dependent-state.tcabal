@@ -1,5 +1,5 @@
 name:                dependent-state
-version:             1.0.2
+version:             1.0.3
 synopsis:            Control structure similar to Control.Monad.State, allowing multiple nested states, distinguishable by provided phantom types.
 -- description:
 license:             Apache-2.0
@@ -52,3 +52,5 @@ Library
                     , lens
                     , mtl
                     , prologue
+                    , primitive
+                    , exceptions

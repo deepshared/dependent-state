@@ -6,12 +6,18 @@ module Control.Monad.State.Dependent where
 import Prologue
 
 import qualified Control.Monad.State as State
+import qualified Control.Monad.Catch (MonadMask, MonadCatch, MonadThrow)
+import           Control.Monad.Fix
+import           Control.Monad.Primitive
 
 
 -- === Types and classes ===
 
 newtype StateT t s m a = StateT (State.StateT s m a)
-                       deriving (Functor, Monad, Applicative, MonadIO, MonadPlus, MonadTrans, Alternative, MonadFix)
+                         deriving ( Functor, Monad, Applicative, MonadIO, MonadPlus, MonadTrans, Alternative
+                                  , MonadFix, MonadMask, MonadCatch, MonadThrow)
+
+makeWrapped ''StateT
 
 type State t s = StateT t s Identity
 
@@ -23,10 +29,10 @@ fromStateT :: StateT t s m a -> State.StateT s m a
 fromStateT (StateT s) = s
 {-# INLINE fromStateT #-}
 
--- Basic instances 
+-- Basic instances
 
-instance {-# OVERLAPPABLE #-} Monad m => MonadGet t s (StateT t s m) where get _ = StateT State.get   ; {-# INLINE get #-}
-instance {-# OVERLAPPABLE #-} Monad m => MonadPut t s (StateT t s m) where put _ = StateT . State.put ; {-# INLINE put #-}
+instance {-# OVERLAPPABLE #-} (Monad m, s ~ s') => MonadGet t s (StateT t s' m) where get _ = StateT State.get   ; {-# INLINE get #-}
+instance {-# OVERLAPPABLE #-} (Monad m, s ~ s') => MonadPut t s (StateT t s' m) where put _ = StateT . State.put ; {-# INLINE put #-}
 
 instance State.MonadState r m => State.MonadState r (StateT t s m) where
     get = StateT (lift State.get)   ; {-# INLINE get #-}
@@ -34,6 +40,11 @@ instance State.MonadState r m => State.MonadState r (StateT t s m) where
 
 instance {-# OVERLAPPABLE #-} (MonadGet tp s m, MonadTrans t, Monad (t m)) => MonadGet tp s (t m) where get = lift .  get ; {-# INLINE get #-}
 instance {-# OVERLAPPABLE #-} (MonadPut tp s m, MonadTrans t, Monad (t m)) => MonadPut tp s (t m) where put = lift .: put ; {-# INLINE put #-}
+
+-- Primitive
+instance PrimMonad m => PrimMonad (StateT t s m) where
+    type PrimState (StateT t s m) = PrimState m
+    primitive = lift . primitive ; {-# INLINE primitive #-}
 
 
 -- === Utilities ===
