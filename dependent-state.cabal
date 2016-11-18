@@ -1,63 +1,36 @@
----------------------------------------------------
--- This is a generated cabal configuration file. --
--- DO NOT EDIT!                                  --
--- Use gencabal instead.                         --
----------------------------------------------------
+-- This file has been generated from package.yaml by hpack version 0.14.0.
+--
+-- see: https://github.com/sol/hpack
 
-name:                dependent-state
-version:             1.0.3
-synopsis:            Control structure similar to Control.Monad.State, allowing multiple nested states, distinguishable by provided phantom types.
--- description:
-license:             Apache-2.0
-license-file:        LICENSE
-author:              Wojciech Danilo
-maintainer:          Wojciech Danilo <wojciech.danilo@gmail.com>
-stability:           experimental
-homepage:            https://github.com/wdanilo/dependent-state
-bug-reports:         https://github.com/wdanilo/dependent-state/issues
-copyright:           Copyright (C) 2015 Wojciech Danilo
-category:            Data
-build-type:          Simple
--- extra-source-files:
-cabal-version:       >=1.10
+name:           dependent-state
+version:        1.0.3
+synopsis:       Control structure similar to Control.Monad.State, allowing multiple nested states, distinguishable by provided phantom types.
+category:       Data
+stability:      experimental
+homepage:       https://github.com/wdanilo/dependent-state
+bug-reports:    https://github.com/wdanilo/dependent-state/issues
+author:         Wojciech Danilo
+maintainer:     Wojciech Danilo <wojciech.danilo@gmail.com>
+copyright:      Copyright (C) 2015 Wojciech Danilo
+license:        Apache-2.0
+license-file:   LICENSE
+build-type:     Simple
+cabal-version:  >= 1.10
 
-
-Library
-  hs-source-dirs:     src
-  ghc-options:        -Wall -O2
-  default-language:   Haskell2010
-
-  default-extensions: ConstraintKinds
-                      DataKinds
-                      DefaultSignatures
-                      DeriveDataTypeable
-                      DeriveFoldable
-                      DeriveFunctor
-                      DeriveGeneric
-                      DeriveTraversable
-                      DoAndIfThenElse
-                      EmptyDataDecls
-                      FlexibleContexts
-                      FlexibleInstances
-                      GeneralizedNewtypeDeriving
-                      InstanceSigs
-                      LambdaCase
-                      MultiParamTypeClasses
-                      NoImplicitPrelude
-                      OverloadedStrings
-                      StandaloneDeriving
-                      TemplateHaskell
-                      TupleSections
-                      TypeOperators
-                      ViewPatterns
-                      TypeFamilies
-
-  exposed-modules:    
-        Control.Monad.State.Dependent
-
-  build-depends:      base >=4.6 && <4.10
-                    , lens
-                    , mtl
-                    , prologue
-                    , primitive
-                    , exceptions
+library
+  hs-source-dirs:
+      src
+  default-extensions: ConstraintKinds DataKinds DefaultSignatures DeriveDataTypeable DeriveFoldable DeriveFunctor DeriveGeneric DeriveTraversable DoAndIfThenElse EmptyDataDecls FlexibleContexts FlexibleInstances GeneralizedNewtypeDeriving InstanceSigs LambdaCase MultiParamTypeClasses NoImplicitPrelude OverloadedStrings StandaloneDeriving TemplateHaskell TupleSections TypeOperators ViewPatterns TypeFamilies
+  ghc-options: -Wall -O2
+  build-depends:
+      base >=4.6 && <4.10
+    , lens
+    , mtl
+    , prologue
+    , primitive
+    , exceptions
+  exposed-modules:
+      Control.Monad.State.Dependent
+  other-modules:
+      Paths_dependent_state
+  default-language: Haskell2010
