@@ -3,7 +3,7 @@
 -- see: https://github.com/sol/hpack
 
 name:           dependent-state
-version:        1.0.3
+version:        1.0.4
 synopsis:       Control structure similar to Control.Monad.State, allowing multiple nested states, distinguishable by provided phantom types.
 category:       Data
 stability:      experimental
@@ -31,6 +31,5 @@ library
     , exceptions
   exposed-modules:
       Control.Monad.State.Dependent
-  other-modules:
-      Paths_dependent_state
+      Control.Monad.State.Dependent.Old
   default-language: Haskell2010
