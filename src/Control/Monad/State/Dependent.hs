@@ -13,25 +13,27 @@ import Prelude
 
 import Control.Applicative
 import Control.Lens.Utils
+import Control.Monad.Catch
 import Control.Monad.Fail
 import Control.Monad.Identity
 import Control.Monad.IO.Class
 import Control.Monad.Primitive
 import Control.Monad.Trans
+import Control.Monad.Trans.Maybe
 import Data.Constraint
 import Data.Default
 import Type.Bool
 import qualified Control.Monad.State as S
 
 
----------------------
--- Dependent State --
----------------------
+-----------------------------
+-- === Dependent State === --
+-----------------------------
 
--- Definition --
+-- === Definition === --
 
 type    State  s     = StateT s Identity
-newtype StateT s m a = StateT (S.StateT s m a) deriving (Applicative, Alternative, Functor, Monad, MonadFail, MonadFix, MonadIO, MonadPlus, MonadTrans)
+newtype StateT s m a = StateT (S.StateT s m a) deriving (Applicative, Alternative, Functor, Monad, MonadFail, MonadFix, MonadIO, MonadPlus, MonadTrans, MonadThrow)
 makeWrapped ''StateT
 
 type        States  ss = StatesT ss Identity
@@ -40,7 +42,7 @@ type family StatesT ss m where
     StatesT (s ': ss) m = StateT s (StatesT ss m)
 
 
--- Running --
+-- === Running === --
 
 runStateT  :: forall s m a. Monad m => StateT s m a -> s -> m (a, s)
 evalStateT :: forall s m a. Monad m => StateT s m a -> s -> m a
@@ -71,7 +73,7 @@ evalDefState = flip evalState def
 execDefState = flip execState def
 
 
--- MonadState --
+-- === MonadState === --
 
 type MonadState s m = (MonadGetter s m, MonadSetter s m)
 
@@ -98,7 +100,7 @@ type family MonadStates ss m :: Constraint where
     MonadStates (s ': ss) m = (MonadState s m, MonadStates ss m)
 
 
--- State inference --
+-- === State inference === --
 
 type MonadGetter' t s m = (s ~ InferState t m, MonadGetter s m)
 type MonadSetter' t s m = (s ~ InferState t m, MonadSetter s m)
@@ -115,7 +117,7 @@ type family MatchedBases (a :: ka) (b :: kb) :: Bool where
     MatchedBases (a :: k) (b   :: l) = 'False
 
 
--- Singleton state inference --
+-- === Singleton state inference === --
 
 type MonadGetter_ s m = (s ~ GetFirstState m, MonadGetter s m)
 type MonadSetter_ s m = (s ~ GetFirstState m, MonadSetter s m)
@@ -126,7 +128,7 @@ type family GetFirstState (m :: * -> *) where
     GetFirstState (t m)        = GetFirstState m
 
 
--- Modification of raw state --
+-- === Modification of raw state === --
 
 modifyM'  :: forall s m a. MonadState s m => (s -> m (a, s)) -> m a
 modifyM'_ :: forall s m a. MonadState s m => (s -> m     s)  -> m ()
@@ -150,7 +152,7 @@ branched'        m = do s <- get' @s
                         a <$ put @s s
 
 
--- Modification of inferred state --
+-- === Modification of inferred state === --
 
 get :: forall t s m. MonadGetter' t s m => m s
 put :: forall t s m. MonadSetter' t s m => s -> m ()
@@ -176,7 +178,7 @@ withModified  = withModified'  @s
 withModifiedM = withModifiedM' @s
 
 
--- Modification of inferred singleton state --
+-- === Modification of inferred singleton state === --
 
 _get :: forall s m. MonadGetter_ s m => m s
 _put :: forall s m. MonadSetter_ s m => s -> m ()
@@ -202,13 +204,24 @@ _withModified  = withModified'  @s
 _withModifiedM = withModifiedM' @s
 
 
--- Instances --
+-- === Instances === --
 
+-- Matching the right state
 instance {-# OVERLAPPABLE #-} MonadGetter s m => MonadGetter s (StateT s' m)
 instance {-# OVERLAPPABLE #-} MonadSetter s m => MonadSetter s (StateT s' m)
-instance Monad m => MonadGetter s (StateT s m) where get' = wrap   S.get
-instance Monad m => MonadSetter s (StateT s m) where put' = wrap . S.put
+instance                      Monad m         => MonadGetter s (StateT s  m) where get' = wrap   S.get
+instance                      Monad m         => MonadSetter s (StateT s  m) where put' = wrap . S.put
 
+-- Primitive
 instance PrimMonad m => PrimMonad (StateT s m) where
     type PrimState (StateT s m) = PrimState m
     primitive = lift . primitive
+
+
+-- === Std types instances === --
+
+instance MonadGetter s m => MonadGetter s (S.StateT s' m)
+instance MonadSetter s m => MonadSetter s (S.StateT s' m)
+
+instance MonadGetter s m => MonadGetter s (MaybeT m)
+instance MonadSetter s m => MonadSetter s (MaybeT m)
