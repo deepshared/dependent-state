@@ -25,7 +25,6 @@ import Data.Default
 import Type.Bool
 import qualified Control.Monad.State as S
 
-
 -----------------------------
 -- === Dependent State === --
 -----------------------------
@@ -102,14 +101,26 @@ type family MonadStates ss m :: Constraint where
 
 -- === State inference === --
 
-type MonadGetter' t s m = (s ~ InferState t m, MonadGetter s m)
-type MonadSetter' t s m = (s ~ InferState t m, MonadSetter s m)
-type MonadState'  t s m = (s ~ InferState t m, MonadState  s m)
+type MonadGetter' t s m = (InferState t m s, MonadGetter s m)
+type MonadSetter' t s m = (InferState t m s, MonadSetter s m)
+type MonadState'  t s m = (InferState t m s, MonadState  s m)
 
-type family InferState (t :: k) (m :: * -> *) :: * where
-    InferState p m            = p
-    InferState p (StateT s m) = If (MatchedBases p s) s (InferState p m)
-    InferState p (t m)        = InferState p m
+class InferState (t :: k) (m :: * -> *) (s :: *) | t m -> s
+instance {-# OVERLAPPABLE #-} InferSubState (DiscoverMonad m) st st'
+      => InferState (st :: k -> k') m st'
+instance InferState (st :: *)       m st
+
+class InferSubState (p :: Either (*,* -> *) (* -> *)) (t :: k) (s :: *) | p t -> s
+instance InferState st m st'                        => InferSubState ('Right m)     st st'
+instance InferState' (MatchedBases st s) s st m st' => InferSubState ('Left '(s,m)) st st'
+
+class InferState' (b :: Bool) (ps :: *) (t :: k) (m :: * -> *) (s :: *) | b ps t m -> s
+instance                        InferState' 'True  ps st m ps
+instance InferState st m st' => InferState' 'False ps st m st'
+
+type family DiscoverMonad m where
+    DiscoverMonad (StateT s m) = 'Left '(s, m)
+    DiscoverMonad (t        m) = 'Right m
 
 type family MatchedBases (a :: ka) (b :: kb) :: Bool where
     MatchedBases (a :: k) (b   :: k) = a == b
