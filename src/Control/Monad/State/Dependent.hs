@@ -159,8 +159,7 @@ with'              = withModified'  . const
 withModified'      = withModifiedM' . fmap return
 withModifiedM' f m = branched' @s $ modifyM'_ f >> m
 branched'        m = do s <- get' @s
-                        a <- m
-                        a <$ put @s s
+                        m <* put' @s s
 
 
 -- === Modification of inferred state === --
