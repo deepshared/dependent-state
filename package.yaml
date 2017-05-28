@@ -19,4 +19,4 @@ name: dependent-state
 stability: experimental
 synopsis: Control structure similar to Control.Monad.State, allowing multiple nested
   states, distinguishable by provided phantom types.
-version: 1.0.11
+version: 1.0.12
