@@ -38,6 +38,11 @@ type    State  s     = StateT s Identity
 newtype StateT s m a = StateT (S.StateT s m a) deriving (Applicative, Alternative, Functor, Monad, MonadFail, MonadFix, MonadIO, MonadPlus, MonadTrans, MonadThrow)
 makeWrapped ''StateT
 
+type        States  ss = StatesT ss Identity
+type family StatesT ss m where
+    StatesT '[]       m = m
+    StatesT (s ': ss) m = StateT s (StatesT ss m)
+
 
 -- === State data discovery === --
 
