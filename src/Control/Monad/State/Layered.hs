@@ -14,6 +14,7 @@ import Prelude
 
 import Control.Applicative
 import Control.Lens.Utils
+import Control.Monad.Base
 import Control.Monad.Catch
 import Control.Monad.Fail
 import Control.Monad.Identity
@@ -35,7 +36,7 @@ import qualified Control.Monad.State as S
 -- === Definition === --
 
 type    State  s     = StateT s Identity
-newtype StateT s m a = StateT (S.StateT s m a) deriving (Applicative, Alternative, Functor, Monad, MonadFail, MonadFix, MonadIO, MonadPlus, MonadTrans, MonadThrow)
+newtype StateT s m a = StateT (S.StateT s m a) deriving (Applicative, Alternative, Functor, Monad, MonadFail, MonadFix, MonadIO, MonadPlus, MonadTrans, MonadThrow, MonadBase)
 makeWrapped ''StateT
 
 type        States  ss = StatesT ss Identity

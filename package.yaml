@@ -9,7 +9,7 @@ default-extensions: [ConstraintKinds, DataKinds, DefaultSignatures, DeriveDataTy
   StandaloneDeriving, TemplateHaskell, TupleSections, TypeOperators, ViewPatterns,
   TypeFamilies]
 dependencies: [base >=4.6 && <4.10, lens, mtl, prologue, primitive, exceptions, lens-utils,
-  constraints, data-default, typelevel, transformers]
+  constraints, data-default, typelevel, transformers, transformers-base]
 ghc-options: [-Wall, -O2]
 homepage: https://github.com/wdanilo/dependent-state
 library: {source-dirs: src}
@@ -19,4 +19,4 @@ name: dependent-state
 stability: experimental
 synopsis: Control structure similar to Control.Monad.State, allowing multiple nested
   states, distinguishable by provided phantom types.
-version: 1.0.13
+version: 1.0.14
