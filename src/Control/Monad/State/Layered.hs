@@ -36,7 +36,7 @@ import qualified Control.Monad.State as S
 -- === Definition === --
 
 type    State  s     = StateT s Identity
-newtype StateT s m a = StateT (S.StateT s m a) deriving (Applicative, Alternative, Functor, Monad, MonadFail, MonadFix, MonadIO, MonadPlus, MonadTrans, MonadThrow, MonadBase)
+newtype StateT s m a = StateT (S.StateT s m a) deriving (Applicative, Alternative, Functor, Monad, MonadFail, MonadFix, MonadIO, MonadPlus, MonadTrans, MonadThrow, MonadBase b)
 makeWrapped ''StateT
 
 type        States  ss = StatesT ss Identity
