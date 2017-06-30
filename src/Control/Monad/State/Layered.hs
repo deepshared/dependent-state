@@ -134,16 +134,16 @@ gets' l = view l <$> get'
 stateT :: (s -> m (a,s)) -> StateT s m a
 stateT = StateT . S.StateT
 
-runStateT  :: forall s m a. Monad m => StateT s m a -> s -> m (a, s)
-evalStateT :: forall s m a. Monad m => StateT s m a -> s -> m a
-execStateT :: forall s m a. Monad m => StateT s m a -> s -> m s
-runStateT  = S.runStateT  . unwrap
-evalStateT = S.evalStateT . unwrap
-execStateT = S.execStateT . unwrap
+runStateT  :: forall s m a.              StateT s m a -> s -> m (a, s)
+evalStateT :: forall s m a. Functor m => StateT s m a -> s -> m a
+execStateT :: forall s m a. Functor m => StateT s m a -> s -> m s
+runStateT    = S.runStateT  . unwrap
+evalStateT m = fmap fst . runStateT m
+execStateT m = fmap snd . runStateT m
 
-runDefStateT  :: forall s m a. (Monad m, Default s) => StateT s m a -> m (a, s)
-evalDefStateT :: forall s m a. (Monad m, Default s) => StateT s m a -> m a
-execDefStateT :: forall s m a. (Monad m, Default s) => StateT s m a -> m s
+runDefStateT  :: forall s m a.             Default s  => StateT s m a -> m (a, s)
+evalDefStateT :: forall s m a. (Functor m, Default s) => StateT s m a -> m a
+execDefStateT :: forall s m a. (Functor m, Default s) => StateT s m a -> m s
 runDefStateT  = flip runStateT  def
 evalDefStateT = flip evalStateT def
 execDefStateT = flip execStateT def
