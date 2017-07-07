@@ -15,6 +15,7 @@ import Prelude
 import Control.Applicative
 import Control.Lens.Utils
 import Control.Monad.Base
+import Control.Monad.Branch
 import Control.Monad.Catch
 import Control.Monad.Fail
 import Control.Monad.Identity
@@ -36,7 +37,7 @@ import qualified Control.Monad.State as S
 -- === Definition === --
 
 type    State  s     = StateT s Identity
-newtype StateT s m a = StateT (S.StateT s m a) deriving (Applicative, Alternative, Functor, Monad, MonadFail, MonadFix, MonadIO, MonadPlus, MonadTrans, MonadThrow, MonadBase b)
+newtype StateT s m a = StateT (S.StateT s m a) deriving (Applicative, Alternative, Functor, Monad, MonadFail, MonadFix, MonadIO, MonadPlus, MonadTrans, MonadThrow, MonadBase b, MonadBranch)
 makeWrapped ''StateT
 
 type        States  ss = StatesT ss Identity
@@ -175,14 +176,14 @@ modifyM_  = modifyM  @l . (fmap.fmap) ((),)
 modifyM f = do (a,t) <- f =<< get @l
                a <$ put @l t
 
-branched      :: forall l s m a. (MonadState l m, s ~ DiscoverStateData l m) =>               m a -> m a
+subState      :: forall l s m a. (MonadState l m, s ~ DiscoverStateData l m) =>               m a -> m a
 with          :: forall l s m a. (MonadState l m, s ~ DiscoverStateData l m) => s          -> m a -> m a
 withModified  :: forall l s m a. (MonadState l m, s ~ DiscoverStateData l m) => (s ->   s) -> m a -> m a
 withModifiedM :: forall l s m a. (MonadState l m, s ~ DiscoverStateData l m) => (s -> m s) -> m a -> m a
 with              = withModified  @l . const
 withModified      = withModifiedM @l . fmap return
-withModifiedM f m = branched @l $ modifyM_ @l f >> m
-branched        m = do s <- get @l
+withModifiedM f m = subState @l $ modifyM_ @l f >> m
+subState        m = do s <- get @l
                        m <* put @l s
 
 
@@ -198,14 +199,14 @@ modifyM'_  = modifyM'  . (fmap.fmap) ((),)
 modifyM' f = do (a,t) <- f =<< get'
                 a <$ put' t
 
-branched'      :: forall s m a. (MonadState' m, s ~ TopStateData m) =>               m a -> m a
+subState'      :: forall s m a. (MonadState' m, s ~ TopStateData m) =>               m a -> m a
 with'          :: forall s m a. (MonadState' m, s ~ TopStateData m) => s          -> m a -> m a
 withModified'  :: forall s m a. (MonadState' m, s ~ TopStateData m) => (s ->   s) -> m a -> m a
 withModifiedM' :: forall s m a. (MonadState' m, s ~ TopStateData m) => (s -> m s) -> m a -> m a
 with'              = withModified'  . const
 withModified'      = withModifiedM' . fmap return
-withModifiedM' f m = branched' $ modifyM'_ f >> m
-branched'        m = do s <- get'
+withModifiedM' f m = subState' $ modifyM'_ f >> m
+subState'        m = do s <- get'
                         m <* put' s
 
 
