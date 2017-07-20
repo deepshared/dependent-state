@@ -3,20 +3,7 @@ resolver: lts-8.23
 packages:
     - .
 
-    - ../container
-    - ../convert
-    - ../data-construction
-    - ../data-layer
-    - ../data-prop
-    - ../data-repr
-    - ../data-rtuple
-    - ../functor-utils
-    - ../impossible
-    - ../lens-utils
-    - ../prologue
-    - ../typelevel
-    - ../monoid
-    - ../monad-branch
+
 
 extra-deps:
     - cond-0.4.1.1
