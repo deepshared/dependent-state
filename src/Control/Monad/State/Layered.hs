@@ -77,6 +77,10 @@ type family MatchedBases (a :: ka) (b :: kb) :: Bool where
     MatchedBases (a :: k) (b   :: l) = 'False
 
 
+-- (.) :: (b -> c) -> (a -> b) -> a -> c
+-- (.) f g = \x -> f (g x) ; {-# INLINE (.) #-}
+
+
 -- === MonadState === --
 
 -- Definitions
