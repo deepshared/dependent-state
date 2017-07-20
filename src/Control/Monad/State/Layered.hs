@@ -11,12 +11,12 @@
 
 module Control.Monad.State.Layered where
 
-import Prelude --hiding ((.))
+import Prelude --hiding ((.)) -- https://ghc.haskell.org/trac/ghc/ticket/14001
 
 import Control.Applicative
--- import Control.Lens.Utils
+import Control.Lens.Utils
 import Control.Monad.Base
--- import Control.Monad.Branch
+import Control.Monad.Branch
 import Control.Monad.Catch
 import Control.Monad.Fail
 import Control.Monad.Identity
@@ -28,20 +28,10 @@ import Data.Constraint
 import Data.Default
 import Data.Kind (Type)
 import Control.Lens
--- import Type.Bool
+import Type.Bool
 import qualified Control.Monad.State.Strict as S
--- import Data.Functor.Utils
 
 
-type family If (cond :: Bool) (a :: k) (b :: k) :: k where
-  If cond   a a = a
-  If 'True  a b = a
-  If 'False a b = b
-
-
-type family (a :: k) == (b :: l) where
-    a == a = 'True
-    a == b = 'False
 -------------------
 -- === State === --
 -------------------
@@ -49,7 +39,7 @@ type family (a :: k) == (b :: l) where
 -- === Definition === --
 
 type    State  s     = StateT s Identity
-newtype StateT s m a = StateT (S.StateT s m a) deriving (Applicative, Alternative, Functor, Monad, MonadFail, MonadFix, MonadIO, MonadPlus, MonadTrans, MonadThrow, MonadBase b)
+newtype StateT s m a = StateT (S.StateT s m a) deriving (Applicative, Alternative, Functor, Monad, MonadFail, MonadFix, MonadIO, MonadPlus, MonadTrans, MonadThrow, MonadBase b, MonadBranch)
 makeWrapped ''StateT
 
 type        States  ss = StatesT ss Identity
@@ -77,10 +67,6 @@ type family MatchedBases (a :: ka) (b :: kb) :: Bool where
     MatchedBases (a :: k) (b   :: l) = 'False
 
 
--- (.) :: (b -> c) -> (a -> b) -> a -> c
--- (.) f g = \x -> f (g x) ; {-# INLINE (.) #-}
-
-
 -- === MonadState === --
 
 -- Definitions
@@ -91,8 +77,8 @@ class Monad m => MonadSetter l m where put :: DiscoverStateData l m -> m ()
 
 -- Instancess
 
-instance                       Monad m                                                           => MonadGetter (l :: Type) (StateT l m) where get   = view (from _Wrapped)   S.get    ; {-# INLINE get #-}
-instance                       Monad m                                                           => MonadSetter (l :: Type) (StateT l m) where put a = view (from _Wrapped) $ S.put a  ; {-# INLINE put #-}
+instance                       Monad m                                                           => MonadGetter (l :: Type) (StateT l m) where get   = wrap   S.get    ; {-# INLINE get #-}
+instance                       Monad m                                                           => MonadSetter (l :: Type) (StateT l m) where put a = wrap $ S.put a  ; {-# INLINE put #-}
 instance {-# OVERLAPPABLE #-}  MonadGetter l m                                                   => MonadGetter (l :: Type) (StateT s m) where get   = lift $ get @l   ; {-# INLINE get #-}
 instance {-# OVERLAPPABLE #-}  MonadSetter l m                                                   => MonadSetter (l :: Type) (StateT s m) where put a = lift $ put @l a ; {-# INLINE put #-}
 instance {-# OVERLAPPABLE #-} (Monad m, MonadGetter__ ok l (StateT s m), ok ~ MatchedBases l s)  => MonadGetter (l :: k)    (StateT s m) where get   = get__  @ok @l   ; {-# INLINE get #-}
@@ -154,7 +140,7 @@ stateT = StateT . S.StateT ; {-# INLINE stateT #-}
 runStateT  :: forall s m a.              StateT s m a -> s -> m (a, s)
 evalStateT :: forall s m a. Functor m => StateT s m a -> s -> m a
 execStateT :: forall s m a. Functor m => StateT s m a -> s -> m s
-runStateT    = S.runStateT  . view _Wrapped  ; {-# INLINE runStateT  #-}
+runStateT    = S.runStateT  . unwrap  ; {-# INLINE runStateT  #-}
 evalStateT m = fmap fst . runStateT m ; {-# INLINE evalStateT #-}
 execStateT m = fmap snd . runStateT m ; {-# INLINE execStateT #-}
 
@@ -168,9 +154,9 @@ execDefStateT = flip execStateT def ; {-# INLINE execDefStateT #-}
 runState  :: forall s a. State s a -> s -> (a, s)
 evalState :: forall s a. State s a -> s -> a
 execState :: forall s a. State s a -> s -> s
-runState  = S.runState  . view _Wrapped ; {-# INLINE runState  #-}
-evalState = S.evalState . view _Wrapped ; {-# INLINE evalState #-}
-execState = S.execState . view _Wrapped ; {-# INLINE execState #-}
+runState  = S.runState  . unwrap ; {-# INLINE runState  #-}
+evalState = S.evalState . unwrap ; {-# INLINE evalState #-}
+execState = S.execState . unwrap ; {-# INLINE execState #-}
 
 runDefState  :: forall s a. Default s => State s a -> (a, s)
 evalDefState :: forall s a. Default s => State s a -> a

@@ -9,7 +9,7 @@ default-extensions: [ConstraintKinds, DataKinds, DefaultSignatures, DeriveDataTy
   StandaloneDeriving, TemplateHaskell, TupleSections, TypeApplications, TypeOperators, ViewPatterns,
   TypeFamilies]
 dependencies: [base >=4.6 && <4.10, lens, mtl, primitive, exceptions,
-  constraints, data-default, transformers, transformers-base]
+  constraints, data-default, transformers, transformers-base, typelevel, lens-utils, monad-branch]
 ghc-options: [-Wall, -O2]
 homepage: https://github.com/wdanilo/dependent-state
 library: {source-dirs: src}
@@ -29,5 +29,3 @@ benchmarks:
     dependencies:
       - criterion
       - dependent-state
-      - kan-extensions
-      - mtl-c
