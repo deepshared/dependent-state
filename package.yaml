@@ -29,3 +29,5 @@ benchmarks:
     dependencies:
       - criterion
       - dependent-state
+      - mtl-c
+      - kan-extensions

@@ -31,7 +31,6 @@ import Control.Lens
 import Type.Bool
 import qualified Control.Monad.State.Strict as S
 
-
 -------------------
 -- === State === --
 -------------------
