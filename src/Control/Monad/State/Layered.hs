@@ -7,6 +7,7 @@
 {-# LANGUAGE TypeInType             #-}
 {-# LANGUAGE RankNTypes             #-}
 {-# LANGUAGE Strict #-}
+{-# LANGUAGE BangPatterns #-}
 {-# EXT      InlineAll              #-}
 
 module Control.Monad.State.Layered where
@@ -174,7 +175,7 @@ modify_  :: forall l s m a. (MonadState l m, s ~ DiscoverStateData l m) => (s ->
 modify    = modifyM  @l . fmap return       ; {-# INLINE modify   #-}
 modify_   = modifyM_ @l . fmap return       ; {-# INLINE modify_  #-}
 modifyM_  = modifyM  @l . (fmap.fmap) ((),) ; {-# INLINE modifyM_ #-}
-modifyM f = do (a,t) <- f =<< get @l
+modifyM f = do (!a,!t) <- f =<< get @l
                a <$ put @l t
 {-# INLINE modifyM #-}
 
@@ -199,7 +200,7 @@ modify'_  :: forall s m a. (MonadState' m, s ~ TopStateData m) => (s ->       s)
 modify'    = modifyM'  . fmap return       ; {-# INLINE modify'   #-}
 modify'_   = modifyM'_ . fmap return       ; {-# INLINE modify'_  #-}
 modifyM'_  = modifyM'  . (fmap.fmap) ((),) ; {-# INLINE modifyM'_ #-}
-modifyM' f = do (a,t) <- f =<< get'
+modifyM' f = do (!a,!t) <- f =<< get'
                 a <$ put' t
 {-# INLINE modifyM' #-}
 
