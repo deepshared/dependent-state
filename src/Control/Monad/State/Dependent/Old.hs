@@ -3,7 +3,7 @@
 
 module Control.Monad.State.Dependent.Old where
 
-import Prologue
+import Prologue_old
 
 import qualified Control.Monad.State as State
 import qualified Control.Monad.Catch (MonadMask, MonadCatch, MonadThrow)
