@@ -12,6 +12,7 @@ module Control.Monad.State.Dependent where
 import Prelude
 
 import Control.Applicative
+import Control.Lens
 import Control.Lens.Utils
 import Control.Monad.Catch
 import Control.Monad.Fail
