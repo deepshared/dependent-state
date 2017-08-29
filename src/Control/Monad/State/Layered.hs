@@ -32,6 +32,7 @@ import Control.Lens
 import Type.Bool
 import qualified Control.Monad.State.Strict as S
 
+
 -------------------
 -- === State === --
 -------------------
@@ -220,3 +221,10 @@ subState'        m = do s <- get'
 
 mapStateT :: (m (a, s) -> n (b, s)) -> StateT s m a -> StateT s n b
 mapStateT f = _Wrapped %~ S.mapStateT f ; {-# INLINE mapStateT #-}
+
+
+-- === Instances === --
+
+instance PrimMonad m => PrimMonad (StateT s m) where
+  type PrimState (StateT s m) = PrimState m
+  primitive = lift . primitive ; {-# INLINE primitive #-}
