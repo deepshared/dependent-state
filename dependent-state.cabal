@@ -1,0 +1,85 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.31.2.
+--
+-- see: https://github.com/sol/hpack
+--
+-- hash: 2f5d03cd173215024a9eed4c87a64537722a1565a967da13c7ea5c06d6983c21
+
+name:           dependent-state
+version:        1.1
+synopsis:       Control structure similar to Control.Monad.State, allowing multiple nested states, distinguishable by provided phantom types.
+category:       Data
+stability:      experimental
+homepage:       https://github.com/wdanilo/dependent-state
+bug-reports:    https://github.com/wdanilo/dependent-state/issues
+author:         Wojciech Danilo
+maintainer:     Wojciech Danilo <wojciech.danilo@gmail.com>
+copyright:      Copyright (C) 2015 Wojciech Danilo
+license:        Apache-2.0
+license-file:   LICENSE
+build-type:     Simple
+
+library
+  exposed-modules:
+      Control.Monad.State.Composable
+      Control.Monad.State.Dependent
+      Control.Monad.State.Dependent.Old
+      Control.Monad.State.Layered
+  other-modules:
+      Paths_dependent_state
+  hs-source-dirs:
+      src
+  default-extensions: ConstraintKinds DataKinds DefaultSignatures DeriveDataTypeable DeriveFoldable DeriveFunctor DeriveGeneric DeriveTraversable DoAndIfThenElse EmptyDataDecls FlexibleContexts FlexibleInstances GeneralizedNewtypeDeriving InstanceSigs LambdaCase MultiParamTypeClasses NoImplicitPrelude OverloadedStrings StandaloneDeriving TemplateHaskell TupleSections TypeApplications TypeOperators ViewPatterns TypeFamilies
+  ghc-options: -Wall -O2
+  build-depends:
+      base
+    , constraints
+    , data-default
+    , exceptions
+    , lens
+    , lens-utils
+    , monad-branch
+    , monoid
+    , mtl
+    , primitive
+    , profunctors
+    , prologue
+    , transformers
+    , transformers-base
+    , typelevel
+  default-language: Haskell2010
+
+benchmark layered-state-benchmark
+  type: exitcode-stdio-1.0
+  main-is: Main.hs
+  other-modules:
+      Paths_dependent_state
+  hs-source-dirs:
+      test/bench
+  default-extensions: ConstraintKinds DataKinds DefaultSignatures DeriveDataTypeable DeriveFoldable DeriveFunctor DeriveGeneric DeriveTraversable DoAndIfThenElse EmptyDataDecls FlexibleContexts FlexibleInstances GeneralizedNewtypeDeriving InstanceSigs LambdaCase MultiParamTypeClasses NoImplicitPrelude OverloadedStrings StandaloneDeriving TemplateHaskell TupleSections TypeApplications TypeOperators ViewPatterns TypeFamilies
+  ghc-options: -Wall -O2
+  build-depends:
+      base
+    , constraints
+    , criterion
+    , data-default
+    , deepseq
+    , dependent-state
+    , either
+    , exceptions
+    , kan-extensions
+    , lens
+    , lens-utils
+    , monad-branch
+    , monoid
+    , mtl
+    , mtl-c
+    , primitive
+    , profunctors
+    , prologue
+    , timeit
+    , transformers
+    , transformers-base
+    , typelevel
+  default-language: Haskell2010
